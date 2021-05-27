@@ -6,43 +6,65 @@ require('dotenv').config({ path: '.env' });
 const { OAUTH_CLIENT_ID, OAUTH_CLIENT_SECRET, OAUTH_AUTHORIZE, OAUTH_TOKEN_URL, OAUTH_RESOURCE_URL, OAUTH_CALLBACK_URL } = process.env;
 
 module.exports = {
-
-    async obtainCode(account, passwd, captcha, phpsessid) {
+    async checkCaptcha(captcha) {
+        if (captcha == "" || captcha == undefined)
+            return false;
         const options = {
             method: 'POST',
-            url: OAUTH_AUTHORIZE,
-            qs: {
-                client_id: 'nthusa',
-                response_type: 'code',
-                state: 'xyz',
-                scope: 'userid',
-            },
-            headers: {
-                'Postman-Token': '9f1982c4-453d-42af-980e-3ac17decba27',
-                'cache-control': 'no-cache',
-                'Cookie': `PHPSESSID=${phpsessid};`,
-                'User-Agent': 'Mozilla/5.0',
-                'Origin': 'https://oauth.ccxp.nthu.edu.tw',
-                'Host': 'oauth.ccxp.nthu.edu.tw',
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
+            url: 'https://www.google.com/recaptcha/api/siteverify',
             form: {
-                account,
-                passwd,
-                oauth_captcha: captcha,
-                undefined: undefined,
+                secret: "6LcSkvQaAAAAAD0b2JWNCx25ozFaSaVVvbsrKkO2",
+                response: captcha
             },
         };
         try {
             await rp(options);
         } catch (error) {
-            if (error.response.statusCode === 302 && error.response.body === '') {
-                return (error.response.headers.location.split('?code=')[1].split('&')[0]);
-            } else {
-                throw Error('obtain code from ccxp authorize failed.');
-            }
+            return false;
         }
-        throw Error('obtain code from ccxp authorize failed.');
+        return true;
+    },
+
+    async obtainCode(account, passwd, captcha, phpsessid) {
+        const a = await this.checkCaptcha(captcha)
+        if (a) {
+            const options = {
+                method: 'POST',
+                url: OAUTH_AUTHORIZE,
+                qs: {
+                    client_id: 'nthusa',
+                    response_type: 'code',
+                    state: 'xyz',
+                    scope: 'userid',
+                },
+                headers: {
+                    'Postman-Token': '9f1982c4-453d-42af-980e-3ac17decba27',
+                    'cache-control': 'no-cache',
+                    'Cookie': `PHPSESSID=${phpsessid};`,
+                    'User-Agent': 'Mozilla/5.0',
+                    'Origin': 'https://oauth.ccxp.nthu.edu.tw',
+                    'Host': 'oauth.ccxp.nthu.edu.tw',
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                form: {
+                    account,
+                    passwd,
+                    oauth_captcha: captcha,
+                    undefined: undefined,
+                },
+            };
+            try {
+                await rp(options);
+            } catch (error) {
+                if (error.response.statusCode === 302 && error.response.body === '') {
+                    return (error.response.headers.location.split('?code=')[1].split('&')[0]);
+                } else {
+                    throw Error('obtain code from ccxp authorize failed.');
+                }
+            }
+            return 'success login';
+        }
+        throw Error('captcha authorize failed.');
     },
 
 

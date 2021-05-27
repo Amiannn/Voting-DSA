@@ -2,14 +2,15 @@ require('dotenv').config({ path: '.env' });
 const express = require('express');
 const bodyParser = require('body-parser');
 const config = require('./config.js');
+const path = require('path');
 const app = express();
 const Mongoose = require('mongoose');
 const fileUpload = require('express-fileupload');
 
 const { MONGO_USERNAME, MONGO_PASSWORD, MONGO_HOST, MONGO_NAME } = process.env;
 
-// const url = `mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@${MONGO_HOST}/${MONGO_NAME}?authSource=admin&w=1`;
-const url = `mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@${MONGO_HOST}/${MONGO_NAME}`;
+const url = `mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@${MONGO_HOST}/${MONGO_NAME}?authSource=admin&w=1`;
+// const url = `mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@${MONGO_HOST}/${MONGO_NAME}`;
 Mongoose.connect(url, {
     keepAlive: true,
     useNewUrlParser: true,
@@ -26,6 +27,9 @@ require('./models/options');
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json({ type: 'application/json' }));
 app.use(fileUpload());
+
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'hbs');
 
 app.use(require('./router'));
 app.use(express.static('./public'));

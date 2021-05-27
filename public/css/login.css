@@ -1,14 +1,18 @@
 .login-dark {
     height: 1000px;
+    /* background: #475d62
+        url(https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/The_Logo_of_National_Tsing_Hua_University.svg/1200px-The_Logo_of_National_Tsing_Hua_University.svg.png); */
     background: #475d62
-        url(https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/The_Logo_of_National_Tsing_Hua_University.svg/1200px-The_Logo_of_National_Tsing_Hua_University.svg.png);
-    background-size: cover;
+        url(https://www.nkust.edu.tw/var/file/0/1000/img/513/176957439.png);
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
     position: relative;
     background-color: slategray;
 }
 
 .login-dark > div {
-    max-width: 320px;
+    max-width: 380px;
     width: 90%;
     background-color: #1e2833;
     padding: 40px;

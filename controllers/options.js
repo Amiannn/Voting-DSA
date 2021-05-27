@@ -21,7 +21,10 @@ module.exports = {
                 let vice1 = req.body.vice1;
                 let vice2 = req.body.vice2;
                 result = await Options.create({ ...params, vice1, vice2, created_at, updated_at });
-            } else {
+            } else if (req.body.vice1 != undefined){
+                let vice1 = req.body.vice1;
+                result = await Options.create({ ...params, vice1, created_at, updated_at });
+            } else{
                 result = await Options.create({ ...params, created_at, updated_at });
             }
             await Activities.updateOne({ _id: activity_id }, {

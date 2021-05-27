@@ -91,7 +91,7 @@ async function getCandidate(opt) {
 // for choose_one
 const candidateAppend = () => {
     for (idx = 0; idx < candidateTempl.length; idx++) {
-        imgIwantThis = 'https://i.imgur.com/ue4ktGb.png';
+        imgIwantThis = './img/vote1.png';
         members = candidateTempl[idx][0].member;
         cardTitles = candidateTempl[idx][0].cardTitle;
         imgs = candidateTempl[idx][0].img;
@@ -175,7 +175,7 @@ const candidateAppend = () => {
 
 const candidatesAppend = (actName) => {
     for (idx = 0; idx < candidateTempl.length; idx++) {
-        imgIwantThis = 'https://i.imgur.com/ue4ktGb.png';
+        imgIwantThis = './img/vote1.png';
         imgClickIcon = '/img/click-icon.png';
         members = candidateTempl[idx][0].member;
         cardTitles = candidateTempl[idx][0].cardTitle;
