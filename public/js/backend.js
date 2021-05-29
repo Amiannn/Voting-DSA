@@ -326,8 +326,14 @@ function detailFormatter(index, row) {
                 `);
                 chartQueue.push({ name: candidate.name, chartId, vote });
             }
-            html.push('</ul>');
+            html.push(`
+                    <div class="row justify-content-center">
+                        <div class="col-md-11">
+                            <hr class="mt-2 mb-3"/>
+                        </div>
+                    </div>`);
         });
+        html.push('</ul>');
         html.push('<ul><li><b>投票時間統計：</b></li></ul>');
         const timeChartId = `chart-${makeId(10)}`;
         html.push(`
