@@ -253,39 +253,89 @@ function detailFormatter(index, row) {
         const candidates = resp.data;
         const candidatesIdMapping = {};
         const result = getVotes(row._id, candidates);
+        const numOfE = getNumOfElectors(row._id);
+        console.log(numOfE);
         const voteStatics = result.statics;
         votes = result.votes;
-        html.push('<b>候選人：</b><ol>');
+        html.push('<ul><li><b>候選人：</b></li>');
         candidates.forEach((item) => {
             // TOOD: 投票結果排序
             const candidate = item.candidate;
             const id = item._id;
             candidatesIdMapping[id] = candidate.name;
-            let vote_result = '';
+            let vresult = [];
             if (voteStatics[id] !== undefined) {
                 const vote = voteStatics[id];
                 $.each(vote, (k, v) => {
-                    vote_result += `${k}: ${v}`;
+                    vresult.push(v);
                 });
-            }
-            html.push(`<li>${candidate.name} - ${candidate.department}`);
+            } else vresult = [0, 0, 0];
+            const vsum = vresult[0] + vresult[1] + vresult[2];
+
+            html.push(`<ul><li><b>${candidate.department}${candidate.name} - 投票結果統計(應投票人數為${numOfE}人)</b></li></ul>`);
+            html.push(`
+                <p></p>
+                <div class="row justify-content-center">
+                    <div class="col-lg-auto">
+                        <table class="table table-responsive">
+                            <tr class = "table-info text-center">
+                                <th scope="col"></th>
+                                <th scope="col">　　　同　意　　　</th>
+                                <th scope="col">　　　反　對　　　</th>
+                                <th scope="col">　　　無　效　　　</th>
+                                <th scope="col">　　　總　計　　　</th>
+                            </tr>
+                            <tbody>
+                            <tr class = "text-center">
+                                <th scope="row">得　票　數</th>
+                                <td>${vresult[0]}票</td>
+                                <td>${vresult[1]}票</td>
+                                <td>${vresult[2]}票</td>
+                                <td>${vsum}票</td>
+                            </tr>
+                            <tr class = "text-center">
+                                <th scope="row">得　票　率</th>
+                                <td>${Math.round((vresult[0] / (vsum + 0.000001))*10000) / 100}%</td>
+                                <td>${Math.round((vresult[1] / (vsum + 0.000001))*10000) / 100}%</td>
+                                <td>${Math.round((vresult[2] / (vsum + 0.000001))*10000) / 100}%</td>
+                                <td>100%</td/
+                            </tr>
+                            <tr class = "text-center">
+                                <th scope="row">投　票　率</th>
+                                <td>${Math.round((vresult[0] / (numOfE + 0.000001))*10000) / 100}%</td>
+                                <td>${Math.round((vresult[1] / (numOfE + 0.000001))*10000) / 100}%</td>
+                                <td>${Math.round((vresult[2] / (numOfE + 0.000001))*10000) / 100}%</td>
+                                <td>${Math.round((vsum / (numOfE + 0.000001))*10000) / 100}%</td>
+                            </tr>
+                            </tbody>
+                    </table>
+                    </div>
+                </div>
+            `);
+            
             if (voteStatics[id] !== undefined) {
                 const vote = voteStatics[id];
-                html.push('<ul>');
-                $.each(vote, (k, v) => {
-                    html.push(`<li>${k}: ${v}</li>`);
-                });
-                html.push('</ul>');
                 const chartId = `chart-${makeId(10)}`;
-                html.push(`<div class="col-md-7"><canvas id="${chartId}"></canvas></div>`);
+                html.push(`
+                    <p></p>
+                    <div class="row justify-content-center">
+                        <div class="col-md-7">    
+                            <canvas id="${chartId}"></canvas>
+                        </div>
+                    </div>
+                `);
                 chartQueue.push({ name: candidate.name, chartId, vote });
             }
-            html.push('</li>');
+            html.push('</ul>');
         });
-        html.push('</ol>');
-        html.push('<b>投票時間統計：</b>');
+        html.push('<ul><li><b>投票時間統計：</b></li></ul>');
         const timeChartId = `chart-${makeId(10)}`;
-        html.push(`<div class="col-md-11"><canvas id="${timeChartId}"></canvas></div>`);
+        html.push(`
+            <div class="row justify-content-center">
+                <div class="col-md-11">
+                    <canvas id="${timeChartId}"></canvas>
+                </div>
+            </div>`);
         timeChartQueue.push({ time: result.vote_time, chartId: timeChartId });
         // 驗票
         let verificationBody = '';
@@ -299,10 +349,13 @@ function detailFormatter(index, row) {
         verificationBody += '</ol>';
         html.push(addModal(row._id, verificationBody));
         html.push(`
-        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#verification-${row._id}">
-            驗票
-        </button>
-        `);
+            <div class="row justify-content-center">
+                <div class="col-md-7">
+                    <button type="button" class="btn btn-secondary btn-lg btn-block" data-toggle="modal" data-target="#verification-${row._id}">
+                        驗票
+                    </button>
+                </div>
+            </div>`);
         return html.join('');
 
         function addModal(id, content) {
@@ -373,6 +426,30 @@ function getVotes(activityId, candidates) {
             vote_time.push(moment(vote.created_at).startOf('hour').toDate());
         });
         return { statics, votes, vote_time };
+    }
+}
+
+function getNumOfElectors(activityId) {
+    const resp = $.ajax({
+        url: '/votes/getNumOfElectors',
+        data: JSON.stringify({
+            activity_id: activityId,
+        }),
+        type: 'POST',
+        dataType: 'json',
+        contentType: 'application/json;charset=utf-8',
+        headers: { 'Authorization': `Bearer ${jwtToken}` },
+        async: false,
+        success: function(resp) {
+            return resp;
+        },
+        error: function(xhr, ajaxOptions, thrownError) {
+            alert('發生錯誤，請確認您是否擁有管理員權限！');
+            return false;
+        },
+    }).responseJSON;
+    if (resp) {
+        return resp.nums;
     }
 }
 
