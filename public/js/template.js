@@ -332,7 +332,7 @@ async function getAvailableActivities() {
             onclick="getCandidates('${activity._id}', '${activity.name}');">${activity.name}</button>`;
             });
             resActivities.data.unavailable.forEach((activity) => {
-                node.innerHTML += `<span class="d-inline-block" data-toggle="popover" data-content="尚未開始或已經結束"><button type="button" class="btn btn-link disabled">${activity.name}</button></span>`;
+                node.innerHTML += `<span class="d-inline-block" data-toggle="popover" data-content="${activity.msg}"><button type="button" class="btn btn-link disabled">${activity.name}</button></span>`;
             });
             $('.d-inline-block').popover(options);
         }, () => {

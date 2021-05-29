@@ -2,6 +2,8 @@
 const Mongoose = require('mongoose');
 const Activities = Mongoose.model('activities');
 
+const eValidate = require('../libs/electoralValidate');
+
 module.exports = {
     async addActivity(req, res) {
         try {
@@ -50,18 +52,32 @@ module.exports = {
             const { _id: user_id, student_id } = req.user;
             const now = new Date();
             const availableData = await Activities.find({users: {'$nin': user_id}, open_from: {'$lt': now}, open_to: {'$gte': now}}, null, {limit, skip, sort}).lean();
-            // 已投過票, 時候未到, 時間已過
-            const unavailableData = await Activities.find({$or: [
-                {users: {'$in': user_id}},
-                {open_from: {'$gte': now}},
-                {open_to: {'$lt': now}}]
+            // 時候未到, 時間已過
+            const unavailableData = await Activities.find({
+                users: {'$nin': user_id},
+                open_from: {'$gte': now},
+                open_to: {'$lt': now}
+            }).lean();
+            // 已投過票
+            const unavailableVote = await Activities.find({
+                users: {'$in': user_id},
+                open_from: {'$lt': now},
+                open_to: {'$gte': now}
             }).lean();
             const result = {'available': [], 'unavailable': []};
             availableData.forEach((activity) => {
-                result.available.push({_id: activity._id, name: activity.name});
+                if (eValidate.validate(activity.name, student_id))
+                    result.available.push({_id: activity._id, name: activity.name});
+                else
+                    result.unavailable.push({_id: activity._id, name: activity.name, msg: '您無法參加此項投票'});
             });
             unavailableData.forEach((activity) => {
-                result.unavailable.push({_id: activity._id, name: activity.name});
+                const message = '尚未開始或已經結束';
+                result.unavailable.push({_id: activity._id, name: activity.name, msg: message});
+            });
+            unavailableVote.forEach((activity) =>{
+                const message = '您已經完成此項投票';
+                result.unavailable.push({_id: activity._id, name: activity.name, msg: message});
             });
             res.json(result);
         } catch (error) {
