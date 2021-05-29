@@ -175,7 +175,6 @@ const chooseAllClick = (
         attr2ID(paramsList.bk1).css('display', 'block');
         attr2ID(paramsList.bk2).css('display', 'block');
         $(`.img-click-icon-${memberOption}-yes`).css('max-width', '12%');
-        votes[`${memberOption}`] = undefined;
     }
     remarks[`${remarkIdx}`] = `${candidateName} :` + votes[`${memberOption}`];
     if (votes[`${memberOption}`] === undefined) remarks[`${remarkIdx}`] = undefined;

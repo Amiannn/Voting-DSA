@@ -22,6 +22,7 @@ module.exports = {
 
             // Validate choose_all remark
             if (rule === 'choose_all') {
+                // const valid = choose_all.every((choice) => ['我要投給他', '我不投給他', '我沒有意見'].includes(choice.remark));
                 const valid = choose_all.every((choice) => ['我要投給他', '我不投給他', '我沒有意見'].includes(choice.remark));
                 if (!valid) throw new Error('Failed to add vote, choose_all remark is not valid');
             }
@@ -164,6 +165,18 @@ module.exports = {
             const result = await Votes.deleteOne({ _id }).lean();
             res.json(result.n > 0 ? { success: true } : {});
         } catch (error) {
+            res.status(404).send(error.message || error);
+        }
+    },
+
+    async getNumOfElectors(req, res) {
+        try {
+            const { activity_id } = req.body;
+            const activity = await Activities.findById(activity_id).lean();
+            if (!activity) throw new Error('Failed to add vote, activity_id not found');
+        
+            res.json(eValidate.numOfElectors(activity.name));
+        } catch(error) {
             res.status(404).send(error.message || error);
         }
     },

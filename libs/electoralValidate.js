@@ -1,5 +1,6 @@
 const path = require('path')
 const fs   = require('fs');
+const { getNumOfElectors } = require('../controllers/votes');
 
 const base_path     = './libs/electoralRegister';
 const electoralDict = {};
@@ -24,5 +25,15 @@ module.exports = {
             console.log(error);
         }
         return false;
+    },
+
+    numOfElectors(activity_name) {
+        try {
+            const num = electoralDict[activity_name].length;
+            return {"nums" : num};
+        } catch(error) {
+            console.log(error);
+        }
+        return 0;
     }
 };

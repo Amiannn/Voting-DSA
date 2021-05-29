@@ -39,6 +39,7 @@ router.post('/votes/getVotes', authentication, adminAuthorization, votes.getVote
 // Deprecated: router.post('/votes/getVoteResult', votes.getVoteResult);
 // No Need: router.post('/votes/modifyVote', votes.modifyVote);
 router.post('/votes/removeVote', authentication, adminAuthorization, votes.removeVote);
+router.post('/votes/getNumOfElectors', authentication, votes.getNumOfElectors);
 
 // activities
 router.post('/activities/addActivity', authentication, adminAuthorization, activities.addActivity);
