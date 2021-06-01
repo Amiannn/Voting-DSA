@@ -8,3 +8,5 @@ db_files/
 uploads/
 wget*
 *.csv
+*.jpg
+*.png

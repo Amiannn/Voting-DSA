@@ -53,11 +53,11 @@ module.exports = {
             const now = new Date();
             const availableData = await Activities.find({users: {'$nin': user_id}, open_from: {'$lt': now}, open_to: {'$gte': now}}, null, {limit, skip, sort}).lean();
             // 時候未到, 時間已過
-            const unavailableData = await Activities.find({
-                users: {'$nin': user_id},
-                open_from: {'$gte': now},
-                open_to: {'$lt': now}
-            }).lean();
+            const unavailableData = await Activities.find({$or: [
+                // users: {'$nin': user_id},
+                {open_from: {'$gte': now}},
+                {open_to: {'$lt': now}}
+            ]}).lean();
             // 已投過票
             const unavailableVote = await Activities.find({
                 users: {'$in': user_id},
