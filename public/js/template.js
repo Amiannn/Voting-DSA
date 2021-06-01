@@ -152,7 +152,7 @@ const candidateAppend = () => {
             </div>
             <div class="col-sm-4">
                <ul class="list-group candidateItems">
-                  <li class="list-group-item active candidateItemsTitle">個人政見</li>
+                  <li class="list-group-item active candidateItemsTitle">政見</li>
                   {{each(i,opis) politicalOpinions}}
                   <li class="list-group-item">\${opis}</li>
                   {{/each}}
@@ -231,7 +231,7 @@ const candidatesAppend = (actName) => {
             </div>
             <div class="col-md-4 col-sm-12">
                <ul class="list-group candidateItems">
-                  <li class="list-group-item active candidateItemsTitle">個人政見</li>
+                  <li class="list-group-item active candidateItemsTitle">政見</li>
                   {{each(i,opis) politicalOpinions}}
                   <li class="list-group-item">\${opis}</li>
                   {{/each}}
