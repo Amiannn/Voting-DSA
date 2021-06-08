@@ -40,12 +40,13 @@ module.exports = {
         try {
             const { account, passwd, captcha } = req.body;
             const reslut = await nkustAuth.cawlerAPI(account, passwd, captcha);
-            let user = await Users.findOne({ student_id: account }).lean();
+            var student_id = account.toUpperCase();
+            let user = await Users.findOne({ student_id: student_id }).lean();
             if (!user) {
-                const newUser = await Users.create({ student_id: account, created_at: Date.now(), updated_at: Date.now() });
+                const newUser = await Users.create({ student_id: student_id, created_at: Date.now(), updated_at: Date.now() });
                 user = newUser.toObject();
             }
-            const serviceToken = nkustAuth.obtainServiceToken(account, user);
+            const serviceToken = nkustAuth.obtainServiceToken(student_id, user);
             res.cookie('service_token', serviceToken);
             res.send({ status: true });
         } catch (e) {
